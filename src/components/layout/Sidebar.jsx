@@ -4,7 +4,6 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 const menuItems = [
   { label: 'Kegiatan', path: '/kegiatan', icon: Compass },
   { label: 'Bookmark', path: '/bookmark', icon: Bookmark },
-  { label: 'Pendaftaran Saya', path: '/pendaftaran', icon: CalendarCheck },
   { label: 'Riwayat', path: '/riwayat', icon: History },
   { label: 'Sertifikat', path: '/sertifikat', icon: Award },
 ]

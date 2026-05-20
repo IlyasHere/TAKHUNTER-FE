@@ -3,9 +3,9 @@ import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import BookmarkPage from '../pages/mahasiswa/BookmarkPage'
 import DashboardPage from '../pages/mahasiswa/DashboardPage'
-import PendaftaranPage from '../pages/mahasiswa/PendaftaranPage'
 import RiwayatPage from '../pages/mahasiswa/RiwayatPage'
 import SertifikatPage from '../pages/mahasiswa/SertifikatPage'
+import KegiatanPage from '../pages/mahasiswa/KegiatanPage' // Tambahkan ini
 
 function AppRoutes() {
   return (
@@ -14,11 +14,15 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/kegiatan" element={<DashboardPage />} />
+        
+        {/* Rute Kegiatan */}
+        <Route path="/kegiatan" element={<DashboardPage />} /> 
+        <Route path="/kegiatan/:id" element={<KegiatanPage />} /> {/* Rute Dinamis Detail */}
+        
         <Route path="/bookmark" element={<BookmarkPage />} />
-        <Route path="/pendaftaran" element={<PendaftaranPage />} />
         <Route path="/riwayat" element={<RiwayatPage />} />
         <Route path="/sertifikat" element={<SertifikatPage />} />
+        
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

@@ -2,7 +2,8 @@ import { Bookmark, CalendarDays, MapPin, Star } from 'lucide-react'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
 
-function EventCard({ event }) {
+// Tambahkan onClick di sini
+function EventCard({ event, onClick }) {
   const badgeStyle =
     event.type === 'WAJIB'
       ? 'bg-primary/95 text-white'
@@ -55,7 +56,12 @@ function EventCard({ event }) {
               <Star className="h-[19px] w-[19px]" />
               <span className="text-base font-extrabold">{event.points} Poin</span>
             </div>
-            <Button className="h-10 rounded-xl px-5 text-sm shadow-none">
+            
+            {/* Pasang onClick pada Button */}
+            <Button 
+              onClick={onClick}
+              className="h-10 rounded-xl px-5 text-sm shadow-none"
+            >
               Lihat Detail
             </Button>
           </div>
