@@ -11,15 +11,17 @@ type LoginPayload = {
   password: string
 }
 
+type UserResponse = {
+  id: number
+  name: string
+  email: string
+  role: string
+}
+
 type AuthResponse = {
   message: string
   token: string
-  user: {
-    id: number
-    name: string
-    email: string
-    role: string
-  }
+  user: UserResponse
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -65,7 +67,7 @@ export const loginUser = async (payload: LoginPayload): Promise<AuthResponse> =>
   return parseResponse<AuthResponse>(response, 'Login gagal. Periksa email dan password.')
 }
 
-export const checkAuth = async (token: string): Promise<AuthResponse> => {
+export const checkAuth = async (token: string): Promise<UserResponse> => {
   const response = await fetch(buildUrl('/api/auth/check'), {
     method: 'GET',
     headers: {
@@ -73,5 +75,5 @@ export const checkAuth = async (token: string): Promise<AuthResponse> => {
     },
   })
 
-  return parseResponse<AuthResponse>(response, 'Sesi tidak valid. Silakan login kembali.')
+  return parseResponse<UserResponse>(response, 'Sesi tidak valid. Silakan login kembali.')
 }

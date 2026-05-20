@@ -42,7 +42,7 @@ function LoginPage() {
     <AuthLayout activeTab="login" cardSize="login">
       <form className="flex h-full flex-col justify-center" onSubmit={handleLogin}>
         <Input
-          label="Email"
+          label="email"
           icon={User}
           placeholder="email"
           value={email}
