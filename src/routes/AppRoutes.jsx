@@ -1,7 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
+import AddKegiatanPage from '../pages/event-organizer/AddKegiatanPage'
 import DashboardEOPage from '../pages/event-organizer/DashboardEOPage'
+import DetailKegiatanPage from '../pages/event-organizer/DetailKegiatanPage'
+import EditKegiatanPage from '../pages/event-organizer/EditKegiatanPage'
 import BookmarkPage from '../pages/mahasiswa/BookmarkPage'
 import DashboardPage from '../pages/mahasiswa/DashboardPage'
 import PendaftaranPage from '../pages/mahasiswa/PendaftaranPage'
@@ -22,6 +25,9 @@ function AppRoutes() {
         <Route path="/kegiatan" element={<DashboardPage />} />
         <Route path="/event-organizer/dashboard" element={<DashboardEOPage />} />
         <Route path="/event-organizer/kegiatan" element={<DashboardEOPage />} />
+        <Route path="/event-organizer/kegiatan/tambah" element={<AddKegiatanPage />} />
+        <Route path="/event-organizer/kegiatan/:id" element={<DetailKegiatanPage />} />
+        <Route path="/event-organizer/kegiatan/:id/edit" element={<EditKegiatanPage />} />
         <Route path="/event-organizer/pendaftaran" element={<DashboardEOPage />} />
         <Route path="/event-organizer/riwayat" element={<DashboardEOPage />} />
         <Route path="/event-organizer/sertifikat" element={<DashboardEOPage />} />
