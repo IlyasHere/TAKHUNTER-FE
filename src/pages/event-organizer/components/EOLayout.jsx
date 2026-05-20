@@ -28,7 +28,7 @@ function EOLayout({ title, organizerName, children }) {
 
         <nav className="space-y-2 px-3">
           {menuItems.map((item) => {
-            const isActive = location.pathname === item.path
+            const isActive = location.pathname === item.path || (item.path === '/event-organizer/dashboard' && location.pathname.startsWith('/event-organizer/kegiatan'))
 
             return (
               <NavLink
