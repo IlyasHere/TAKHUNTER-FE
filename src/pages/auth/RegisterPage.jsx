@@ -39,10 +39,16 @@ function RegisterPage() {
 
     try {
       const data = await registerUser(payload)
-      const userRole = data.user?.role
+      const authenticatedUser = data.user || {
+        name,
+        email,
+        role,
+        ...(isMahasiswa ? { nim } : {}),
+      }
+      const userRole = authenticatedUser.role
 
       localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
+      localStorage.setItem('user', JSON.stringify(authenticatedUser))
 
       if (userRole === 'EVENT_ORGANIZER') {
         navigate('/event-organizer/dashboard')
