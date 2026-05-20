@@ -1,4 +1,3 @@
-import React from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { Bookmark, Calendar, MapPin, Trash2 } from 'lucide-react';
 import GambarBm1 from '../../assets/images/bm1.png';
