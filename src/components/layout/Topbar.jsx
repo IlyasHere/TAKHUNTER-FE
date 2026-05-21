@@ -1,6 +1,6 @@
 import { Menu, Search, UserRound } from 'lucide-react'
 
-function Topbar({ title = 'Dashboard Mahasiswa', onMenuClick }) {
+function Topbar({ title = 'Dashboard Mahasiswa', onMenuClick, searchPlaceholder = 'Cari kegiatan...' }) {
   return (
     <header className="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[#DDE1EF] bg-white px-5 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
@@ -20,7 +20,7 @@ function Topbar({ title = 'Dashboard Mahasiswa', onMenuClick }) {
           <Search className="h-[19px] w-[19px] text-[#6F7485]" />
           <input
             type="text"
-            placeholder="Cari kegiatan..."
+            placeholder={searchPlaceholder}
             className="h-full flex-1 bg-transparent px-3 text-sm font-medium text-[#202433] outline-none placeholder:text-[#777B8F]"
           />
         </div>

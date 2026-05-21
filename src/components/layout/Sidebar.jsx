@@ -1,14 +1,20 @@
 import { Award, Bookmark, CalendarCheck, Compass, History, LogOut, X } from 'lucide-react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
-const menuItems = [
+const defaultMenuItems = [
   { label: 'Kegiatan', path: '/kegiatan', icon: Compass },
   { label: 'Bookmark', path: '/bookmark', icon: Bookmark },
   { label: 'Riwayat', path: '/riwayat', icon: History },
   { label: 'Sertifikat', path: '/sertifikat', icon: Award },
 ]
 
-function Sidebar({ isOpen = false, onClose }) {
+function Sidebar({
+  isOpen = false,
+  onClose,
+  menuItems = defaultMenuItems,
+  homePath = '/dashboard',
+  brandSubtitle = 'Sistem Informasi Kegiatan',
+}) {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -34,9 +40,9 @@ function Sidebar({ isOpen = false, onClose }) {
         }`}
       >
         <div className="flex items-start justify-between px-6 pb-8 pt-7">
-          <NavLink to="/dashboard" onClick={onClose}>
+          <NavLink to={homePath} onClick={onClose}>
             <p className="text-[22px] font-extrabold leading-none tracking-wide">TAK Hub</p>
-            <p className="mt-3 text-sm font-medium text-white">Sistem Informasi Kegiatan</p>
+            <p className="mt-3 text-sm font-medium text-white">{brandSubtitle}</p>
           </NavLink>
           <button
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-white/20 lg:hidden"
@@ -55,7 +61,10 @@ function Sidebar({ isOpen = false, onClose }) {
               to={item.path}
               onClick={onClose}
               className={({ isActive }) => {
-                const active = isActive || (location.pathname === '/dashboard' && item.path === '/kegiatan')
+                const active =
+                  isActive ||
+                  (location.pathname === '/dashboard' && item.path === '/kegiatan') ||
+                  (location.pathname === homePath && item.path === homePath)
 
                 return `flex h-11 items-center gap-3 rounded-none border-l-4 px-4 text-[14px] font-medium transition ${
                   active
