@@ -1,13 +1,13 @@
 import { CalendarDays } from 'lucide-react'
 
-function LatestEventCard({ event }) {
+function LatestEventCard({ event, onClick }) {
   const badgeStyle =
     event.type === 'WAJIB'
       ? 'bg-primary text-white'
       : 'bg-[#566072] text-white'
 
   return (
-    <article className="group cursor-pointer">
+    <article onClick={onClick} className="group cursor-pointer">
       <div className="relative h-[136px] overflow-hidden rounded-[10px]">
         <img
           src={event.thumb}
