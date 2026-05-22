@@ -1,34 +1,15 @@
-import { useState } from 'react';
-import { Star } from 'lucide-react';
-import EventCard from '../../components/cards/EventCard';
-import LatestEventCard from '../../components/cards/LatestEventCard';
-import DashboardLayout from '../../components/layout/DashboardLayout';
-import Card from '../../components/ui/Card';
-import Modal from '../../components/ui/Modal';
-import { dummyEvents } from '../../data/dummyEvents';
-import DetailKegiatan from './KegiatanPage'; 
-import FormPendaftaran from './FormPendaftaran'; // TAMBAHKAN BARIS INI
-
-
-function DashboardPage() {
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [modalType, setModalType] = useState(null); 
-  const [activeFilter, setActiveFilter] = useState('Seminar');
-
-  const categories = ['Seminar', 'Workshop', 'Kompetisi', 'Bootcamp'];
-
-  const handleOpenDetail = (event) => {
-    setSelectedEvent(event);
-    setModalType('detail');
-  };
 import { Filter, Star } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import EventCard from '../../components/cards/EventCard'
 import LatestEventCard from '../../components/cards/LatestEventCard'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import Card from '../../components/ui/Card'
+import Modal from '../../components/ui/Modal'
+import Toast from '../../components/ui/Toast'
 import { API_BASE_URL } from '../../lib/api'
 import { getMahasiswaKegiatanList } from '../../services/kegiatanService'
+import DetailKegiatan from './DetailKegiatan'
+import FormPendaftaran from './FormPendaftaran'
 
 const fallbackImage = 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=900&q=80'
 const fallbackThumb = 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=500&q=80'
@@ -92,8 +73,11 @@ const mapKegiatanToEvent = (event) => {
 function DashboardPage() {
   const [events, setEvents] = useState([])
   const [activeCategory, setActiveCategory] = useState('Semua')
+  const [selectedEvent, setSelectedEvent] = useState(null)
+  const [modalType, setModalType] = useState(null)
   const [isLoadingEvents, setIsLoadingEvents] = useState(true)
   const [eventsError, setEventsError] = useState('')
+  const [toastMessage, setToastMessage] = useState('')
 
   useEffect(() => {
     getMahasiswaKegiatanList()
@@ -116,50 +100,50 @@ function DashboardPage() {
   }, [events])
 
   const filteredEvents = activeCategory === 'Semua' ? events : events.filter((event) => event.category === activeCategory)
-  const latestEvents = [...events].slice(0, 2)
+  const latestEvents = events.slice(0, 2)
+
+  const openDetailModal = (event) => {
+    setSelectedEvent(event)
+    setModalType('detail')
+  }
+
+  const closeModal = () => {
+    setSelectedEvent(null)
+    setModalType(null)
+  }
+
+  const handleRegistrationSuccess = () => {
+    closeModal()
+    setToastMessage('Pendaftaran kegiatan berhasil disimpan.')
+  }
+
+  useEffect(() => {
+    if (!toastMessage) return undefined
+
+    const timeoutId = window.setTimeout(() => setToastMessage(''), 3500)
+    return () => window.clearTimeout(timeoutId)
+  }, [toastMessage])
 
   return (
     <DashboardLayout title="Dashboard Mahasiswa">
+      <Toast message={toastMessage} onClose={() => setToastMessage('')} />
       <section className="grid gap-6 xl:grid-cols-[360px_1fr]">
-        
-        {/* Kiri: Profil, Poin, & Filter Chips */}
-        <Card className="border-[#D9DEEE] p-6 shadow-none flex flex-col gap-5">
-          <div>
+        <div>
+          <Card className="border-[#D9DEEE] p-6 shadow-none transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(71,88,224,0.12)]">
             <h2 className="text-[22px] font-extrabold text-[#171B29]">Halo, Ilyas</h2>
-            <p className="text-sm text-[#6C7A93] mt-1">Selamat datang kembali di TAK App.</p>
-          </div>
+            <p className="mt-2 text-[15px] font-medium text-[#7A8298]">Selamat datang kembali di TAK App.</p>
 
-          {/* Kotak Total Poin TAK */}
-          <div className="bg-[#2B54EA] text-white p-4 rounded-2xl flex items-center justify-between shadow-sm relative overflow-hidden">
-            <div>
-              <p className="text-xs text-blue-100 font-medium">Total Poin TAK</p>
-              <p className="text-2xl font-extrabold mt-1">
-                120 <span className="text-lg font-normal text-blue-100">Poin</span>
-              </p>
+            <div className="mt-4 flex h-[66px] w-[224px] items-center justify-between rounded-2xl bg-gradient-to-r from-[#2F73F6] to-[#4770F4] px-6 text-white">
+              <div>
+                <p className="text-xs font-medium text-white/85">Total Poin TAK</p>
+                <p className="mt-1 text-[30px] font-light leading-none">
+                  120<span className="ml-1 text-base font-medium">Poin</span>
+                </p>
+              </div>
+              <Star className="h-9 w-9 fill-yellow-300 text-yellow-300" />
             </div>
-            {/* Lingkaran Bintang */}
-            <div className="bg-[#FFC107] p-2.5 rounded-full flex items-center justify-center shadow-md">
-              <Star className="w-5 h-5 text-white fill-white" />
-            </div>
-          </div>
+          </Card>
 
-          {/* Filter Chips Kategori */}
-          <div className="flex flex-wrap gap-2 pt-1">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveFilter(category)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
-                  activeFilter === category
-                    ? 'bg-[#2B54EA] border-[#2B54EA] text-white shadow-sm'
-                    : 'bg-white border-[#D9DEEE] text-[#6C7A93] hover:bg-gray-50'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </Card>
           <Card className="mt-6 border-[#D9DEEE] p-5 shadow-none">
             <p className="text-xs font-extrabold uppercase tracking-wide text-[#96A0B5]">Ringkasan</p>
             <div className="mt-4 grid grid-cols-2 gap-3">
@@ -175,24 +159,16 @@ function DashboardPage() {
           </Card>
         </div>
 
-        {/* Kanan: Kegiatan Terbaru */}
-        <Card className="border-[#D9DEEE] p-6 shadow-none">
-          <div className="flex items-center justify-between mb-4">
+        <Card className="border-[#D9DEEE] p-6 shadow-none transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(71,88,224,0.12)]">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="text-[18px] font-extrabold text-[#171B29]">Kegiatan Terbaru</h2>
-            <button className="text-sm font-bold text-[#2B54EA] hover:underline transition-all">
-              Lihat semua
-            </button>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {dummyEvents.slice(0, 2).map((event) => (
-              <LatestEventCard key={event.id} event={event} onClick={() => handleOpenDetail(event)} />
-            ))}
+            <button className="text-xs font-extrabold text-primary" type="button">Lihat semua</button>
           </div>
           {isLoadingEvents ? <p className="rounded-2xl bg-[#F8FAFF] p-6 text-center text-sm font-semibold text-[#747B8E]">Memuat kegiatan terbaru...</p> : null}
           {!isLoadingEvents && latestEvents.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
               {latestEvents.map((event) => (
-                <LatestEventCard key={event.id} event={event} />
+                <LatestEventCard key={event.id} event={event} onClick={() => openDetailModal(event)} />
               ))}
             </div>
           ) : null}
@@ -200,13 +176,7 @@ function DashboardPage() {
         </Card>
       </section>
 
-      {/* Konten Bawah: Kegiatan Tersedia */}
       <section className="mt-10">
-        <h2 className="mb-6 text-[22px] font-extrabold text-[#171B29]">Kegiatan Tersedia</h2>
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {dummyEvents.map((event) => (
-            <EventCard key={event.id} event={event} onClick={() => handleOpenDetail(event)} />
-          ))}
         <div className="mb-6 rounded-[24px] border border-[#D9DEEE] bg-white p-5 shadow-[0_12px_30px_rgba(31,41,55,0.04)]">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -246,45 +216,23 @@ function DashboardPage() {
         {!isLoadingEvents && filteredEvents.length > 0 ? (
           <div className="grid gap-6 xl:grid-cols-3">
             {filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard key={event.id} event={event} onClick={() => openDetailModal(event)} />
             ))}
           </div>
         ) : null}
         {!isLoadingEvents && filteredEvents.length === 0 ? <p className="rounded-2xl bg-white p-8 text-center text-sm font-semibold text-[#747B8E]">Belum ada kegiatan tersedia.</p> : null}
       </section>
 
-      {/* Modal Overlay dengan dynamic maxWidth */}
-// Di dalam DashboardPage.jsx, update bagian Modal
-      <Modal 
-        isOpen={!!selectedEvent} 
-        onClose={() => {
-          setSelectedEvent(null);
-          setModalType(null); // Reset saat modal ditutup
-        }}
-        maxWidth={modalType === 'form' ? "max-w-2xl" : "max-w-6xl"} // Ubah ukuran sesuai konten
-      >
-        {selectedEvent && (
-          <>
-            {modalType === 'detail' && (
-              <DetailKegiatan 
-                event={selectedEvent} 
-                onDaftar={() => setModalType('form')} // Pindah ke form saat klik Daftar
-                onClose={() => setSelectedEvent(null)}
-              />
-            )}
-            
-            {modalType === 'form' && (
-              <FormPendaftaran 
-                event={selectedEvent} 
-                onClose={() => setSelectedEvent(null)}
-                onBack={() => setModalType('detail')} // Opsional: Kembali ke detail
-              />
-            )}
-          </>
-        )}
+      <Modal isOpen={Boolean(selectedEvent)} onClose={closeModal} maxWidth={modalType === 'form' ? 'max-w-5xl' : 'max-w-6xl'}>
+        {selectedEvent && modalType === 'detail' ? (
+          <DetailKegiatan event={selectedEvent} onClose={closeModal} onDaftar={() => setModalType('form')} />
+        ) : null}
+        {selectedEvent && modalType === 'form' ? (
+          <FormPendaftaran event={selectedEvent} onClose={closeModal} onSuccess={handleRegistrationSuccess} onBack={() => setModalType('detail')} />
+        ) : null}
       </Modal>
     </DashboardLayout>
-  );
+  )
 }
 
-export default DashboardPage;
+export default DashboardPage

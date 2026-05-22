@@ -9,7 +9,6 @@ import BookmarkPage from '../pages/mahasiswa/BookmarkPage'
 import DashboardPage from '../pages/mahasiswa/DashboardPage'
 import RiwayatPage from '../pages/mahasiswa/RiwayatPage'
 import SertifikatPage from '../pages/mahasiswa/SertifikatPage'
-import KegiatanPage from '../pages/mahasiswa/KegiatanPage' // Tambahkan ini
 
 function AppRoutes() {
   return (
@@ -18,15 +17,6 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        
-        {/* Rute Kegiatan */}
-        <Route path="/kegiatan" element={<DashboardPage />} /> 
-        <Route path="/kegiatan/:id" element={<KegiatanPage />} /> {/* Rute Dinamis Detail */}
-        
-        <Route path="/event-organizer/dashboard" element={<EventOrganizerDashboardPage />} />
-        <Route path="/event-organizer/events" element={<EventOrganizerDashboardPage />} />
-        <Route path="/event-organizer/peserta" element={<EventOrganizerDashboardPage />} />
-        <Route path="/event-organizer/verifikasi" element={<EventOrganizerDashboardPage />} />
         <Route path="/kegiatan" element={<DashboardPage />} />
         <Route path="/event-organizer/dashboard" element={<DashboardEOPage />} />
         <Route path="/event-organizer/kegiatan" element={<DashboardEOPage />} />
