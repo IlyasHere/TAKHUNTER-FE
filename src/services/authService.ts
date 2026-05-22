@@ -16,6 +16,7 @@ type UserResponse = {
   name: string
   email: string
   role: string
+  profilePhotoPath?: string
 }
 
 type AuthResponse = {

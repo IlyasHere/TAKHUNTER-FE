@@ -1,4 +1,4 @@
-import { Award, Bookmark, CalendarCheck, Compass, History, LogOut, X } from 'lucide-react'
+import { Award, Bookmark, Compass, History, LogOut, UserRound, X } from 'lucide-react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 const defaultMenuItems = [
@@ -6,6 +6,7 @@ const defaultMenuItems = [
   { label: 'Bookmark', path: '/bookmark', icon: Bookmark },
   { label: 'Riwayat', path: '/riwayat', icon: History },
   { label: 'Sertifikat', path: '/sertifikat', icon: Award },
+  { label: 'Profil', path: '/profil', icon: UserRound },
 ]
 
 function Sidebar({
