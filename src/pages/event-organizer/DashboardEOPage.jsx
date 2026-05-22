@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Toast from '../../components/ui/Toast'
 import { checkAuth } from '../../services/authService'
-import { deleteKegiatan, getKegiatanList } from '../../services/kegiatanService'
+import { deleteKegiatan, getKegiatanList, getKegiatanPendaftaranList } from '../../services/kegiatanService'
 import EOEventsTable from './components/EOEventsTable'
 import EOLayout from './components/EOLayout'
 import EOStatCard from './components/EOStatCard'
@@ -113,9 +113,23 @@ function DashboardEOPage() {
 
         return getKegiatanList()
       })
-      .then((kegiatan) => {
+      .then(async (kegiatan) => {
         if (kegiatan) {
-          setEvents(kegiatan)
+          const kegiatanWithRegistrantCounts = await Promise.all(
+            kegiatan.map(async (event) => {
+              try {
+                const pendaftaranList = await getKegiatanPendaftaranList(event.id)
+                return {
+                  ...event,
+                  jumlahPendaftar: pendaftaranList.length,
+                }
+              } catch {
+                return event
+              }
+            }),
+          )
+
+          setEvents(kegiatanWithRegistrantCounts)
         }
       })
       .catch((error) => {

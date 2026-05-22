@@ -71,6 +71,11 @@ const normalizeList = (data) => {
   if (Array.isArray(data?.data)) return data.data
   if (Array.isArray(data?.content)) return data.content
   if (Array.isArray(data?.kegiatan)) return data.kegiatan
+  if (Array.isArray(data?.pendaftaran)) return data.pendaftaran
+  if (Array.isArray(data?.pendaftar)) return data.pendaftar
+  if (Array.isArray(data?.pendaftaranList)) return data.pendaftaranList
+  if (Array.isArray(data?.registrants)) return data.registrants
+  if (Array.isArray(data?.items)) return data.items
 
   return []
 }
@@ -105,6 +110,17 @@ export const getKegiatanDetail = async (id) => {
   })
 
   return parseResponse(response, 'Gagal mengambil detail kegiatan.', { method: 'GET', url })
+}
+
+export const getKegiatanPendaftaranList = async (id) => {
+  const url = buildApiUrl(`/api/eo/kegiatan/${id}/pendaftaran`)
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  })
+
+  const data = await parseResponse(response, 'Gagal mengambil data pendaftar kegiatan.', { method: 'GET', url })
+  return normalizeList(data)
 }
 
 export const createKegiatan = async (payload) => {

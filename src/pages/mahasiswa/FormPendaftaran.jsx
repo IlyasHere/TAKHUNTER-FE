@@ -1,19 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { buildApiUrl } from '../../lib/api';
 
-export default function FormPendaftaran({ event, onClose }) {
-  const kegiatanId = event?.id ?? event?.kegiatanId ?? event?.eventId;
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const getBearerToken = () => {
+  const token = (localStorage.getItem('token') || localStorage.getItem('accessToken') || '').trim().replace(/^"|"$/g, '');
 
-  // State disesuaikan dengan field di PendaftaranRequest backend.
+  if (!token) return '';
+  return token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+};
+
+export default function FormPendaftaran({ event, onClose, onSuccess }) {
+  // State disesuaikan dengan field di Pendaftaran.java
   const [formData, setFormData] = useState({
-    kegiatanId,
-    namaMahasiswa: '',
-    nim: '',
-    programStudi: '',
-    email: '',
-    nomorWhatsApp: '',
-    alasan: '',
+      eventId: event?.id || '',
+      namaMahasiswa: '',
+      nim: '',
+      programStudi: '',
+      email: '',
+      nomorWhatsApp: '',
+      alasan: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, kegiatanId }));
@@ -21,20 +28,24 @@ export default function FormPendaftaran({ event, onClose }) {
 
   // Fungsi auto-fill data user dari database.
   useEffect(() => {
+    setFormData(prev => ({ ...prev, eventId: event?.id || '' }));
+
     const fetchUserData = async () => {
+      const token = getBearerToken();
+
       try {
-        const response = await fetch('http://localhost:8080/api/auth/me', {
-          headers: { Authorization: `${localStorage.getItem('token')}` },
+        const response = await fetch(buildApiUrl('/api/auth/me'), {
+          headers: { Authorization: token }
         });
 
         if (response.ok) {
           const data = await response.json();
           setFormData((prev) => ({
             ...prev,
-            namaMahasiswa: data.nama || '',
+            namaMahasiswa: data.nama || data.name || '',
             nim: data.nim || '',
             email: data.email || '',
-            programStudi: data.prodi || '',
+            programStudi: data.prodi || data.programStudi || data.program_studi || ''
           }));
         }
       } catch (err) {
@@ -43,53 +54,68 @@ export default function FormPendaftaran({ event, onClose }) {
     };
 
     fetchUserData();
-  }, []);
+  }, [event?.id]);
+
+  if (!event) return null;
 
   const handleInputChange = (key, value) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const parseResponse = async (response) => {
-    const text = await response.text();
-
-    if (!text) return '';
-
-    try {
-      return JSON.parse(text);
-    } catch {
-      return text;
-    }
+    setFormData(prev => ({ ...prev, [key]: value }));
+    setErrorMessage('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.kegiatanId) {
-      alert('ID kegiatan tidak ditemukan. Silakan tutup form lalu pilih kegiatan lagi.');
+    const kegiatanId = Number(event.id || formData.eventId);
+    const payload = {
+      ...formData,
+      eventId: kegiatanId,
+      kegiatanId,
+    };
+
+    if (!payload.eventId || Number.isNaN(payload.eventId)) {
+      setErrorMessage('ID kegiatan tidak valid. Tutup form lalu pilih kegiatan kembali.');
+      return;
+    }
+
+    if (!payload.namaMahasiswa.trim() || !payload.nim.trim() || !payload.programStudi.trim() || !payload.email.trim() || !payload.nomorWhatsApp.trim()) {
+      setErrorMessage('Nama, NIM, program studi, email, dan nomor WhatsApp wajib diisi.');
       return;
     }
 
     setIsSubmitting(true);
+    setErrorMessage('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/pendaftaran', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+        const response = await fetch(buildApiUrl('/api/pendaftaran'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: getBearerToken(),
+            },
+            body: JSON.stringify(payload)
+        });
 
-      const data = await parseResponse(response);
+        const rawData = await response.text();
+        let data = null;
 
-      if (response.ok) {
-        alert("Pendaftaran berhasil!\nSilakan cek menu 'Pendaftaran Saya' untuk melihat status.");
-        onClose();
-      } else {
-        alert(`Pendaftaran gagal: ${data?.message || data || 'Terjadi kesalahan server'}`);
-      }
+        try {
+          data = rawData ? JSON.parse(rawData) : null;
+        } catch {
+          data = rawData;
+        }
+
+        if (response.ok) {
+            onSuccess?.();
+        } else {
+            // Notifikasi Gagal dari Backend
+            const message = data?.message || data?.error || (typeof data === 'string' ? data : '') || "Terjadi kesalahan server";
+            setErrorMessage(message);
+        }
     } catch (err) {
-      alert(err.message || 'Koneksi ke server gagal. Pastikan backend berjalan.');
+        setErrorMessage("Koneksi ke server gagal. Pastikan backend berjalan.");
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
   };
 
@@ -102,14 +128,20 @@ export default function FormPendaftaran({ event, onClose }) {
         <p className="text-slate-500 text-sm mb-8">Lengkapi data berikut untuk mendaftar kegiatan ini.</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {errorMessage ? (
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
+              {errorMessage}
+            </p>
+          ) : null}
+
           <div className="grid grid-cols-2 gap-4">
             <InputField label="Nama Mahasiswa" value={formData.namaMahasiswa} onChange={(e) => handleInputChange('namaMahasiswa', e.target.value)} required />
             <InputField label="NIM" value={formData.nim} onChange={(e) => handleInputChange('nim', e.target.value)} required />
           </div>
           <InputField label="Program Studi" value={formData.programStudi} onChange={(e) => handleInputChange('programStudi', e.target.value)} />
-          <InputField label="Email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} type="email" />
-          <InputField label="Nomor WhatsApp" value={formData.nomorWhatsApp} onChange={(e) => handleInputChange('nomorWhatsApp', e.target.value)} required />
-
+          <InputField label="Email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} />
+          <InputField label="Nomor WhatsApp" value={formData.nomorWhatsApp} onChange={(e) => handleInputChange('nomorWhatsApp', e.target.value)} />
+          
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Alasan Mengikuti Kegiatan</label>
             <textarea
