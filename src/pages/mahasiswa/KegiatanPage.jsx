@@ -1,7 +1,7 @@
 // src/pages/mahasiswa/KegiatanPage.jsx
 import { ArrowLeft, Calendar, Clock, MapPin, Bookmark, Star, ArrowRight } from 'lucide-react';
 
-export default function DetailKegiatan({ event, onDaftar, onClose }) {
+export default function DetailKegiatan({ event, onDaftar, onClose, onToggleBookmark }) {
   if (!event) return null;
 
   return (
@@ -80,8 +80,13 @@ export default function DetailKegiatan({ event, onDaftar, onClose }) {
                 >
                   Daftar Kegiatan
                 </button>
-                <button className="p-3 border border-slate-300 text-slate-600 rounded-xl hover:bg-slate-50 transition-colors bg-white">
-                  <Bookmark size={20} />
+                <button
+                  type="button"
+                  onClick={() => onToggleBookmark?.(event)}
+                  className={`p-3 border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors bg-white ${event.saved ? 'text-[#4F46E5]' : 'text-slate-600'}`}
+                  aria-label={event.saved ? 'Hapus bookmark' : 'Simpan bookmark'}
+                >
+                  <Bookmark size={20} fill={event.saved ? 'currentColor' : 'none'} />
                 </button>
               </div>
             </div>
