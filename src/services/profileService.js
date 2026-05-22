@@ -9,7 +9,7 @@ const getStoredToken = () => {
 
 const parseResponse = async (response, fallbackMessage) => {
   const rawBody = await response.text().catch(() => '')
-  let data = null
+  let data
 
   try {
     data = rawBody ? JSON.parse(rawBody) : null

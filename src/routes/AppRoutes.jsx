@@ -15,6 +15,7 @@ import DashboardPage from '../pages/mahasiswa/DashboardPage'
 import KegiatanPage from '../pages/mahasiswa/KegiatanPage'
 import RiwayatPage from '../pages/mahasiswa/RiwayatPage'
 import SertifikatPage from '../pages/mahasiswa/SertifikatPage'
+import ProfilePage from '../pages/profile/ProfilePage'
 
 function AppRoutes() {
   return (
@@ -31,6 +32,7 @@ function AppRoutes() {
         <Route path="/bookmark" element={<BookmarkPage />} />
         <Route path="/riwayat" element={<RiwayatPage />} />
         <Route path="/sertifikat" element={<SertifikatPage />} />
+        <Route path="/profil" element={<ProfilePage />} />
 
         {/* Event Organizer */}
         <Route path="/event-organizer/dashboard" element={<DashboardEOPage />} />
@@ -44,6 +46,7 @@ function AppRoutes() {
         <Route path="/event-organizer/pendaftaran" element={<KelolaPendaftaranPage />} />
         <Route path="/event-organizer/riwayat" element={<RiwayatEOPage />} />
         <Route path="/event-organizer/sertifikat" element={<DashboardEOPage />} />
+        <Route path="/event-organizer/profil" element={<ProfilePage role="EVENT_ORGANIZER" />} />
 
         {/* Default */}
         <Route path="/" element={<Navigate to="/login" replace />} />

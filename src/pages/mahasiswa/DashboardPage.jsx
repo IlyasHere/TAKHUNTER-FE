@@ -1,6 +1,5 @@
 import { Filter, Star } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { Filter, Star } from 'lucide-react'
 
 import EventCard from '../../components/cards/EventCard'
 import LatestEventCard from '../../components/cards/LatestEventCard'
@@ -9,7 +8,7 @@ import Card from '../../components/ui/Card'
 import Modal from '../../components/ui/Modal'
 import Toast from '../../components/ui/Toast'
 import { API_BASE_URL } from '../../lib/api'
-import { addBookmark, getBookmarkIds, removeBookmark } from '../../services/bookmarkService'
+import { getBookmarkIds } from '../../services/bookmarkService'
 import { getMahasiswaKegiatanList } from '../../services/kegiatanService'
 import DetailKegiatan from './DetailKegiatan'
 import FormPendaftaran from './FormPendaftaran'
@@ -103,8 +102,6 @@ function DashboardPage() {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [modalType, setModalType] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Semua')
-  const [selectedEvent, setSelectedEvent] = useState(null)
-  const [modalType, setModalType] = useState(null)
   const [isLoadingEvents, setIsLoadingEvents] = useState(true)
   const [eventsError, setEventsError] = useState('')
   const [toastMessage, setToastMessage] = useState('')
@@ -169,51 +166,13 @@ function DashboardPage() {
     return () => window.clearTimeout(timeoutId)
   }, [toastMessage])
 
-  const handleOpenDetail = (event) => {
-    setSelectedEvent(event)
-    setModalType('detail')
-  }
-
-  const syncEventBookmarkState = (eventId, saved) => {
-    setEvents((currentEvents) =>
-      currentEvents.map((event) =>
-        event.id === eventId ? { ...event, saved } : event,
-      ),
-    )
-
-    setSelectedEvent((currentEvent) =>
-      currentEvent?.id === eventId ? { ...currentEvent, saved } : currentEvent,
-    )
-  }
-
-  const handleToggleBookmark = async (event) => {
-    const nextSaved = !event.saved
-    syncEventBookmarkState(event.id, nextSaved)
-
-    try {
-      if (nextSaved) {
-        await addBookmark(event.id)
-      } else {
-        await removeBookmark(event.id)
-      }
-    } catch (error) {
-      syncEventBookmarkState(event.id, !nextSaved)
-      setEventsError(error.message || 'Gagal memperbarui bookmark.')
-    }
-  }
-
-  const handleCloseModal = () => {
-    setSelectedEvent(null)
-    setModalType(null)
-  }
-
   return (
     <DashboardLayout title="Dashboard Mahasiswa">
       <Toast message={toastMessage} onClose={() => setToastMessage('')} />
       <section className="grid gap-6 xl:grid-cols-[360px_1fr]">
         <div>
           <Card className="border-[#D9DEEE] p-6 shadow-none transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(71,88,224,0.12)]">
-            <h2 className="text-[22px] font-extrabold text-[#171B29]">Halo, Ilyas</h2>
+            <h2 className="text-[22px] font-extrabold text-[#171B29]">Halo, {username}</h2>
             <p className="mt-2 text-[15px] font-medium text-[#7A8298]">Selamat datang kembali di TAK App.</p>
 
             <div className="mt-4 flex h-[66px] w-[224px] items-center justify-between rounded-2xl bg-gradient-to-r from-[#2F73F6] to-[#4770F4] px-6 text-white">
