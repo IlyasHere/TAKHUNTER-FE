@@ -22,7 +22,11 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Fungsi auto-fill data user dari database
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, kegiatanId }));
+  }, [kegiatanId]);
+
+  // Fungsi auto-fill data user dari database.
   useEffect(() => {
     setFormData(prev => ({ ...prev, eventId: event?.id || '' }));
 
@@ -33,9 +37,10 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
         const response = await fetch(buildApiUrl('/api/auth/me'), {
           headers: { Authorization: token }
         });
+
         if (response.ok) {
           const data = await response.json();
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             namaMahasiswa: data.nama || data.name || '',
             nim: data.nim || '',
@@ -44,9 +49,10 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
           }));
         }
       } catch (err) {
-        console.error("Gagal auto-fill data:", err);
+        console.error('Gagal auto-fill data:', err);
       }
     };
+
     fetchUserData();
   }, [event?.id]);
 
@@ -113,12 +119,14 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
     }
   };
 
+  if (!event) return null;
+
   return (
     <div className="grid lg:grid-cols-2 w-full bg-white font-sans">
       <div className="p-10 border-r border-slate-100">
         <h2 className="text-2xl font-extrabold text-slate-800 mb-2">Form Pendaftaran Kegiatan</h2>
         <p className="text-slate-500 text-sm mb-8">Lengkapi data berikut untuk mendaftar kegiatan ini.</p>
-        
+
         <form onSubmit={handleSubmit} className="space-y-5">
           {errorMessage ? (
             <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
@@ -127,8 +135,8 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
           ) : null}
 
           <div className="grid grid-cols-2 gap-4">
-            <InputField label="Nama Mahasiswa" value={formData.namaMahasiswa} onChange={(e) => handleInputChange('namaMahasiswa', e.target.value)} />
-            <InputField label="NIM" value={formData.nim} onChange={(e) => handleInputChange('nim', e.target.value)} />
+            <InputField label="Nama Mahasiswa" value={formData.namaMahasiswa} onChange={(e) => handleInputChange('namaMahasiswa', e.target.value)} required />
+            <InputField label="NIM" value={formData.nim} onChange={(e) => handleInputChange('nim', e.target.value)} required />
           </div>
           <InputField label="Program Studi" value={formData.programStudi} onChange={(e) => handleInputChange('programStudi', e.target.value)} />
           <InputField label="Email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} />
@@ -136,8 +144,8 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
           
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Alasan Mengikuti Kegiatan</label>
-            <textarea 
-              className="w-full border p-3 rounded-xl h-32" 
+            <textarea
+              className="w-full border p-3 rounded-xl h-32"
               placeholder="Tuliskan alasan singkat..."
               value={formData.alasan}
               onChange={(e) => handleInputChange('alasan', e.target.value)}
@@ -158,9 +166,9 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
           <img src={event.image || '/default-event.jpg'} alt={event.title} className="w-full h-40 object-cover rounded-xl mb-5" />
           <h3 className="font-extrabold text-slate-800 text-lg mb-4">{event.title}</h3>
           <div className="space-y-4 text-sm text-slate-600 mb-6">
-            <div className="flex items-center gap-3"><span className="text-blue-600">📅</span> {event.date}</div>
-            <div className="flex items-center gap-3"><span className="text-blue-600">⏰</span> {event.time}</div>
-            <div className="flex items-center gap-3"><span className="text-blue-600">📍</span> {event.location}</div>
+            <div className="flex items-center gap-3"><span className="text-blue-600">Tanggal</span> {event.date}</div>
+            <div className="flex items-center gap-3"><span className="text-blue-600">Waktu</span> {event.time}</div>
+            <div className="flex items-center gap-3"><span className="text-blue-600">Lokasi</span> {event.location}</div>
           </div>
           <div className="pt-5 border-t flex justify-between items-center font-extrabold text-blue-700">
             <span>TAK Point</span> <span className="text-lg">{event.points} Poin</span>
@@ -171,14 +179,16 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
   );
 }
 
-function InputField({ label, value, onChange }) {
+function InputField({ label, value, onChange, required = false, type = 'text' }) {
   return (
     <div>
       <label className="block text-sm font-bold text-slate-700 mb-2">{label}</label>
-      <input 
-        className="w-full border p-3 rounded-xl text-sm" 
+      <input
+        className="w-full border p-3 rounded-xl text-sm"
         value={value}
         onChange={onChange}
+        required={required}
+        type={type}
       />
     </div>
   );

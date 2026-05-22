@@ -34,10 +34,15 @@ const parseResponse = async (response, fallbackMessage, requestInfo = {}) => {
   }
 
   if (!response.ok) {
+    const message =
+      response.status === 413
+        ? 'Ukuran banner terlalu besar. Gunakan gambar maksimal 2MB atau kompres gambar terlebih dahulu.'
+        : data?.message ||
+          data?.error ||
+          `[${requestInfo.method || 'REQUEST'} ${requestInfo.url || response.url} -> ${response.status}] ${fallbackMessage}`
+
     const error = new ApiRequestError(
-      data?.message ||
-        data?.error ||
-        `[${requestInfo.method || 'REQUEST'} ${requestInfo.url || response.url} -> ${response.status}] ${fallbackMessage}`,
+      message,
     )
 
     error.status = response.status
