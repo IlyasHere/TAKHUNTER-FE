@@ -1,16 +1,32 @@
 import { Award, ClipboardCheck, Compass, History, LogOut, Menu, Search, UserRound } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { getProfilePhotoUrl, getStoredUser, PROFILE_UPDATED_EVENT } from '../../../utils/userProfile'
 
 const menuItems = [
   { label: 'Kegiatan', path: '/event-organizer/dashboard', icon: Compass },
   { label: 'Kelola Pendaftaran', path: '/event-organizer/pendaftaran', icon: ClipboardCheck },
   { label: 'Riwayat', path: '/event-organizer/riwayat', icon: History },
   { label: 'Sertifikat', path: '/event-organizer/sertifikat', icon: Award },
+  { label: 'Profil', path: '/event-organizer/profil', icon: UserRound },
 ]
 
 function EOLayout({ title, organizerName, children }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState(() => getProfilePhotoUrl(getStoredUser()))
+
+  useEffect(() => {
+    const syncProfilePhoto = () => setProfilePhotoUrl(getProfilePhotoUrl(getStoredUser()))
+
+    window.addEventListener(PROFILE_UPDATED_EVENT, syncProfilePhoto)
+    window.addEventListener('storage', syncProfilePhoto)
+
+    return () => {
+      window.removeEventListener(PROFILE_UPDATED_EVENT, syncProfilePhoto)
+      window.removeEventListener('storage', syncProfilePhoto)
+    }
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -80,8 +96,12 @@ function EOLayout({ title, organizerName, children }) {
             <div className="hidden max-w-[180px] truncate text-right text-sm font-bold text-[#273044] xl:block">
               {organizerName}
             </div>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full border border-[#CED3E5] bg-[#EEF1FA] text-[#161A27]" type="button">
-              <UserRound className="h-5 w-5" strokeWidth={2.1} />
+            <button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[#CED3E5] bg-[#EEF1FA] text-[#161A27]" type="button" onClick={() => navigate('/event-organizer/profil')} aria-label="Buka profil">
+              {profilePhotoUrl ? (
+                <img src={profilePhotoUrl} alt="Foto profil" className="h-full w-full object-cover" />
+              ) : (
+                <UserRound className="h-5 w-5" strokeWidth={2.1} />
+              )}
             </button>
           </div>
         </header>

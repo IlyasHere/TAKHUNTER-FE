@@ -10,6 +10,8 @@ import Modal from '../../components/ui/Modal'
 import { API_BASE_URL } from '../../lib/api'
 import { addBookmark, getBookmarkIds, removeBookmark } from '../../services/bookmarkService'
 import { getMahasiswaKegiatanList } from '../../services/kegiatanService'
+import FormPendaftaran from './FormPendaftaran'
+import DetailKegiatan from './KegiatanPage'
 
 import DetailKegiatan from './KegiatanPage'
 import FormPendaftaran from './FormPendaftaran'
@@ -56,7 +58,7 @@ const formatTime = (value) => {
 }
 
 const normalizeCategory = (value) => {
-  if (!value) return '-'
+  if (!value) return 'Lainnya'
 
   return String(value).charAt(0).toUpperCase() + String(value).slice(1).toLowerCase()
 }
@@ -88,13 +90,25 @@ const mapKegiatanToEvent = (event) => {
   }
 }
 
+const getStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user')) || null
+  } catch {
+    return null
+  }
+}
+
 function DashboardPage() {
+  const storedUser = getStoredUser()
+  const username = storedUser?.name || 'Mahasiswa'
   const [events, setEvents] = useState([])
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [modalType, setModalType] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Semua')
   const [isLoadingEvents, setIsLoadingEvents] = useState(true)
   const [eventsError, setEventsError] = useState('')
+  const [selectedEvent, setSelectedEvent] = useState(null)
+  const [modalType, setModalType] = useState(null)
 
   useEffect(() => {
     Promise.all([
