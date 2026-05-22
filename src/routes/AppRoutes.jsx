@@ -9,6 +9,7 @@ import DetailKegiatanPage from '../pages/event-organizer/DetailKegiatanPage'
 import EditKegiatanPage from '../pages/event-organizer/EditKegiatanPage'
 import KelolaPendaftaranPage from '../pages/event-organizer/KelolaPendaftaranPage'
 import RiwayatEOPage from '../pages/event-organizer/RiwayatEOPage'
+import SertifikatEOPage from '../pages/event-organizer/SertifikatEOPage'
 
 import BookmarkPage from '../pages/mahasiswa/BookmarkPage'
 import DashboardPage from '../pages/mahasiswa/DashboardPage'
@@ -45,7 +46,7 @@ function AppRoutes() {
         <Route path="/event-organizer/kegiatan/:id/edit" element={<EditKegiatanPage />} />
         <Route path="/event-organizer/pendaftaran" element={<KelolaPendaftaranPage />} />
         <Route path="/event-organizer/riwayat" element={<RiwayatEOPage />} />
-        <Route path="/event-organizer/sertifikat" element={<DashboardEOPage />} />
+        <Route path="/event-organizer/sertifikat" element={<SertifikatEOPage />} />
         <Route path="/event-organizer/profil" element={<ProfilePage role="EVENT_ORGANIZER" />} />
 
         {/* Default */}

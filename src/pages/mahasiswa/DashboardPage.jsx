@@ -1,5 +1,6 @@
 import { Filter, Star } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import EventCard from '../../components/cards/EventCard'
 import LatestEventCard from '../../components/cards/LatestEventCard'
@@ -10,6 +11,7 @@ import Toast from '../../components/ui/Toast'
 import { API_BASE_URL } from '../../lib/api'
 import { getBookmarkIds } from '../../services/bookmarkService'
 import { getMahasiswaKegiatanList } from '../../services/kegiatanService'
+import { getMahasiswaSertifikat } from '../../services/sertifikatService'
 import DetailKegiatan from './DetailKegiatan'
 import FormPendaftaran from './FormPendaftaran'
 
@@ -95,10 +97,14 @@ const getStoredUser = () => {
   }
 }
 
+const getCertificatePoints = (certificate) => Number(certificate.poinTak ?? certificate.points ?? 0)
+
 function DashboardPage() {
+  const navigate = useNavigate()
   const storedUser = getStoredUser()
   const username = storedUser?.name || 'Mahasiswa'
   const [events, setEvents] = useState([])
+  const [totalTakPoints, setTotalTakPoints] = useState(0)
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [modalType, setModalType] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Semua')
@@ -110,8 +116,17 @@ function DashboardPage() {
     Promise.all([
       getMahasiswaKegiatanList(),
       getBookmarkIds().catch(() => []),
+      getMahasiswaSertifikat().catch((error) => {
+        if (error.status === 401) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login', { replace: true })
+        }
+
+        return []
+      }),
     ])
-      .then(([kegiatan, bookmarkIds]) => {
+      .then(([kegiatan, bookmarkIds, certificates]) => {
         const bookmarkIdSet = new Set(bookmarkIds.map((id) => Number(id)))
         const mappedEvents = kegiatan
           .filter(
@@ -124,6 +139,7 @@ function DashboardPage() {
           .map((event) => ({ ...event, saved: bookmarkIdSet.has(Number(event.id)) }))
 
         setEvents(mappedEvents)
+        setTotalTakPoints(certificates.reduce((sum, certificate) => sum + getCertificatePoints(certificate), 0))
       })
       .catch((error) => {
         setEventsError(error.message || 'Gagal memuat data kegiatan.')
@@ -131,7 +147,7 @@ function DashboardPage() {
       .finally(() => {
         setIsLoadingEvents(false)
       })
-  }, [])
+  }, [navigate])
 
   const categories = useMemo(() => {
     const uniqueCategories = [
@@ -179,7 +195,7 @@ function DashboardPage() {
               <div>
                 <p className="text-xs font-medium text-white/85">Total Poin TAK</p>
                 <p className="mt-1 text-[30px] font-light leading-none">
-                  120<span className="ml-1 text-base font-medium">Poin</span>
+                  {totalTakPoints.toLocaleString('id-ID')}<span className="ml-1 text-base font-medium">Poin</span>
                 </p>
               </div>
               <Star className="h-9 w-9 fill-yellow-300 text-yellow-300" />
