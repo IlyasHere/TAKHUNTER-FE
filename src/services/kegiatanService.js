@@ -25,7 +25,7 @@ const getAuthHeaders = ({ json = true } = {}) => {
 
 const parseResponse = async (response, fallbackMessage, requestInfo = {}) => {
   const rawBody = await response.text().catch(() => '')
-  let data = null
+  let data
 
   try {
     data = rawBody ? JSON.parse(rawBody) : null

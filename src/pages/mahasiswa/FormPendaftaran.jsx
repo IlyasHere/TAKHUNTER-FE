@@ -22,14 +22,8 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    setFormData((prev) => ({ ...prev, kegiatanId }));
-  }, [kegiatanId]);
-
   // Fungsi auto-fill data user dari database.
   useEffect(() => {
-    setFormData(prev => ({ ...prev, eventId: event?.id || '' }));
-
     const fetchUserData = async () => {
       const token = getBearerToken();
 
@@ -112,7 +106,7 @@ export default function FormPendaftaran({ event, onClose, onSuccess }) {
             const message = data?.message || data?.error || (typeof data === 'string' ? data : '') || "Terjadi kesalahan server";
             setErrorMessage(message);
         }
-    } catch (err) {
+    } catch {
         setErrorMessage("Koneksi ke server gagal. Pastikan backend berjalan.");
     } finally {
         setIsSubmitting(false);
