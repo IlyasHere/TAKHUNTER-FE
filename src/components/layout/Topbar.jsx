@@ -1,6 +1,24 @@
 import { Menu, Search, UserRound } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getProfilePhotoUrl, getStoredUser, PROFILE_UPDATED_EVENT } from '../../utils/userProfile'
 
 function Topbar({ title = 'Dashboard Mahasiswa', onMenuClick, searchPlaceholder = 'Cari kegiatan...' }) {
+  const navigate = useNavigate()
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState(() => getProfilePhotoUrl(getStoredUser()))
+
+  useEffect(() => {
+    const syncProfilePhoto = () => setProfilePhotoUrl(getProfilePhotoUrl(getStoredUser()))
+
+    window.addEventListener(PROFILE_UPDATED_EVENT, syncProfilePhoto)
+    window.addEventListener('storage', syncProfilePhoto)
+
+    return () => {
+      window.removeEventListener(PROFILE_UPDATED_EVENT, syncProfilePhoto)
+      window.removeEventListener('storage', syncProfilePhoto)
+    }
+  }, [])
+
   return (
     <header className="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[#DDE1EF] bg-white px-5 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
@@ -24,8 +42,12 @@ function Topbar({ title = 'Dashboard Mahasiswa', onMenuClick, searchPlaceholder 
             className="h-full flex-1 bg-transparent px-3 text-sm font-medium text-[#202433] outline-none placeholder:text-[#777B8F]"
           />
         </div>
-        <button className="flex h-10 w-10 items-center justify-center rounded-full border border-[#CED3E5] bg-[#EEF1FA] text-[#161A27]" type="button">
-          <UserRound className="h-5 w-5" strokeWidth={2.1} />
+        <button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[#CED3E5] bg-[#EEF1FA] text-[#161A27]" type="button" onClick={() => navigate('/profil')} aria-label="Buka profil">
+          {profilePhotoUrl ? (
+            <img src={profilePhotoUrl} alt="Foto profil" className="h-full w-full object-cover" />
+          ) : (
+            <UserRound className="h-5 w-5" strokeWidth={2.1} />
+          )}
         </button>
       </div>
     </header>
