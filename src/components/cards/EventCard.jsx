@@ -2,8 +2,7 @@ import { Bookmark, CalendarDays, MapPin, Star } from 'lucide-react'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
 
-// Tambahkan onClick di sini
-function EventCard({ event, onClick }) {
+function EventCard({ event, onClick, onToggleBookmark }) {
   const badgeStyle =
     event.type === 'WAJIB'
       ? 'bg-primary/95 text-white'
@@ -30,6 +29,11 @@ function EventCard({ event, onClick }) {
               event.saved ? 'text-primary' : 'text-[#9BA1B2]'
             }`}
             type="button"
+            onClick={(clickEvent) => {
+              clickEvent.stopPropagation()
+              onToggleBookmark?.(event)
+            }}
+            aria-label={event.saved ? 'Hapus bookmark' : 'Simpan bookmark'}
           >
             <Bookmark className="h-[21px] w-[21px]" fill={event.saved ? 'currentColor' : 'none'} strokeWidth={2} />
           </button>
